@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,114 +8,151 @@
 
   <style>
     body {
-  background: #20262E;
-  padding: 20px;
-  font-family: Helvetica;
-}
+      background: #f4f4f4;
+      font-family: Helvetica;
+      padding: 30px;
+    }
 
-#app {
-  background: #fff;
-  border-radius: 4px;
-  padding: 20px;
-  transition: all 0.2s;
-}
+    #app {
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
 
-li {
-  margin: 8px 0;
-}
+    h2 {
+      font-weight: bold;
+      margin-top: 20px;
+    }
 
-h2 {
-  font-weight: bold;
-  margin-bottom: 15px;
-}
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      margin-bottom: 10px;
+    }
 
-del {
-  color: rgba(0, 0, 0, 0.3);
-}
+    .remove {
+      color: red;
+      margin-left: 10px;
+      cursor: pointer;
+    }
 
-input[type="text"] {
-  padding: 10px;
-  width: 200px;
-}
+    .ghost {
+      opacity: 0.5;
+      background: #c8ebfb;
+    }
 
-label .remove {
-  display: none;
-  color: red;
-}
+    li {
+      list-style: none;
+      padding: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 5px;
+      background: #f9f9f9;
+      cursor: move;
+    }
 
-label:hover .remove {
-    display: inline-block;
-    margin-left: 10px;
-    color: red;
-    opacity: 0.5;
-}
+    .pin {
+      cursor: pointer;
+      float: right;
+    }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.15.0/vuedraggable.min.js"></script>
 
-  
 </head>
+
 <body>
   <div id="app">
-  <h2>To do: (4)</h2>
-  <input type="text" placeholder="Type something and press ENTER"/>
-  <ol>
-    <li>
-      <label>
-        <input type="checkbox" />
-        <span>Learn about Vue</span>
-        <a href="#" class="remove">Remove</a>
-      </label>
-    </li>
-    <li>
-      <label>
-        <input type="checkbox" />
-        <span>Learn about Fliplet</span>
-        <a href="#" class="remove">Remove</a>
-      </label>
-    </li>
-    <li>
-      <label>
-        <input type="checkbox" />
-        <span>Play around in JSFiddle</span>
-        <a href="#" class="remove">Remove</a>
-      </label>
-    </li>
-    <li>
-      <label>
-        <input type="checkbox" />
-        <span>Show us what you've got</span>
-        <a href="#" class="remove">Remove</a>
-      </label>
-    </li>
-  </ol>
-  <hr />
-  <h2>
-  Completed items: (1)
-  </h2>
-  <ol>
-    <li>
-      <label>
-        <input type="checkbox" checked />
-        <span>Send job application</span>
-        <a href="#" class="remove">Remove</a>
-      </label>
-    </li>    
-  </ol>
-</div>
+    <h2>To do: ({{ pending.length }})</h2>
+    <input type="text" v-model="newTodo" @keyup.enter="addTodo" placeholder="Type something and press ENTER" />
+    <!-- Pending List -->
+    <draggable v-model="pending" :group="'tasks'" :move="onMove" class="list-group" ghost-class="ghost">
+      <transition-group tag="ul" name="flip">
+        <li v-for="item in pending" :key="item.id">
+          <input type="checkbox" @change="toggleDone(item)" :checked="item.done" />
+          {{ item.text }}
+          <i class="pin" @click="item.fixed = !item.fixed">{{ item.fixed ? '📌' : '📍' }}</i>
+          <span class="remove" @click="removeTodo(item, 'pending')">Remove</span>
+        </li>
+      </transition-group>
+    </draggable>
+
+    <hr />
+    <h2>Completed items: ({{ completed.length }})</h2>
+    <!-- Completed List -->
+    <draggable v-model="completed" :group="'tasks'" :move="onMove" class="list-group" ghost-class="ghost">
+      <transition-group tag="ul" name="flip">
+        <li v-for="item in completed" :key="item.id">
+          <input type="checkbox" @change="toggleDone(item)" :checked="item.done" />
+          <del>{{ item.text }}</del>
+          <i class="pin" @click="item.fixed = !item.fixed">{{ item.fixed ? '📌' : '📍' }}</i>
+          <span class="remove" @click="removeTodo(item, 'completed')">Remove</span>
+        </li>
+      </transition-group>
+    </draggable>
+  </div>
 
 
   <script>
+    Vue.component('draggable', window.vuedraggable);
     new Vue({
-  el: "#app",
-  data: {
-    todos: [
-      { text: "Send job application" },
-      { text: "Learn about Vue" },
-      { text: "Learn about Fliplet" },
-      { text: "Play around in JSFiddle" },
-      { text: "Show us what you've got" }
-    ]
-  }
-})
+      el: '#app',
+      data: {
+        newTodo: '',
+        originalOrder: [],
+        pending: [
+          { id: 1, text: 'Learn Vue', done: false, fixed: false },
+          { id: 2, text: 'Build a todo app', done: false, fixed: false },
+          { id: 3, text: 'Play with drag & drop', done: false, fixed: false }
+        ],
+        completed: [
+          { id: 4, text: 'Submit application', done: true, fixed: false }
+        ]
+      },
+      mounted() {
+        this.originalOrder = [...this.pending.map(item => ({ ...item }))];
+      },
+      methods: {
+        addTodo() {
+          if (this.newTodo.trim()) {
+            this.pending.push({
+              id: Date.now(),
+              text: this.newTodo.trim(),
+              done: false,
+              fixed: false
+            });
+            this.newTodo = '';
+          }
+        },
+        toggleDone(item) {
+          if (item.done) {
+            this.completed = this.completed.filter(i => i.id !== item.id);
+            item.done = false;
+            this.pending.push(item);
+          } else {
+            this.pending = this.pending.filter(i => i.id !== item.id);
+            item.done = true;
+            this.completed.push(item);
+          }
+        },
+        removeTodo(item, list) {
+          this[list] = this[list].filter(i => i.id !== item.id);
+        },
+        restoreOrder() {
+          this.pending = this.originalOrder.map(original => {
+            const current = this.pending.find(i => i.id === original.id);
+            return current || original;
+          });
+        },
+        onMove({ draggedContext, relatedContext }) {
+          return !draggedContext.element.fixed && (!relatedContext.element || !relatedContext.element.fixed);
+        }
+      }
+    });
   </script>
+
 </body>
+
 </html>
