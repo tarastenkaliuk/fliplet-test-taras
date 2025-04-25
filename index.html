@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vue</title>
+
+  <style>
+    body {
+  background: #20262E;
+  padding: 20px;
+  font-family: Helvetica;
+}
+
+#app {
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+li {
+  margin: 8px 0;
+}
+
+h2 {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+del {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+input[type="text"] {
+  padding: 10px;
+  width: 200px;
+}
+
+label .remove {
+  display: none;
+  color: red;
+}
+
+label:hover .remove {
+    display: inline-block;
+    margin-left: 10px;
+    color: red;
+    opacity: 0.5;
+}
+  </style>
+
+  
+</head>
+<body>
+  <div id="app">
+  <h2>To do: (4)</h2>
+  <input type="text" placeholder="Type something and press ENTER"/>
+  <ol>
+    <li>
+      <label>
+        <input type="checkbox" />
+        <span>Learn about Vue</span>
+        <a href="#" class="remove">Remove</a>
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" />
+        <span>Learn about Fliplet</span>
+        <a href="#" class="remove">Remove</a>
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" />
+        <span>Play around in JSFiddle</span>
+        <a href="#" class="remove">Remove</a>
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" />
+        <span>Show us what you've got</span>
+        <a href="#" class="remove">Remove</a>
+      </label>
+    </li>
+  </ol>
+  <hr />
+  <h2>
+  Completed items: (1)
+  </h2>
+  <ol>
+    <li>
+      <label>
+        <input type="checkbox" checked />
+        <span>Send job application</span>
+        <a href="#" class="remove">Remove</a>
+      </label>
+    </li>    
+  </ol>
+</div>
+
+
+  <script>
+    new Vue({
+  el: "#app",
+  data: {
+    todos: [
+      { text: "Send job application" },
+      { text: "Learn about Vue" },
+      { text: "Learn about Fliplet" },
+      { text: "Play around in JSFiddle" },
+      { text: "Show us what you've got" }
+    ]
+  }
+})
+  </script>
+</body>
+</html>
